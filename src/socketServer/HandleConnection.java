@@ -88,6 +88,17 @@ public class HandleConnection implements Runnable {
 							estado = Estado.AUTH;
 						}
 					}// end of LOGIN
+					case "EXIT":{
+						mReply = new Mensagem("EXITREPLY");
+						mReply.setStatus(ReplyStatus.OK);
+						mReply.setParam("response", "Farewell, Traveller!");
+						estado  = Estado.EXIT;
+					}
+					case "LOGOUT":{
+						mReply = new Mensagem("LOGOUTREPLY");
+						mReply.setStatus(ReplyStatus.OK);
+						mReply.setParam("response", "You are not logged in, but thanks to acknowledge us of your presence");
+					}
 					default: {
 						mReply = new Mensagem("LOGINREPLY");
 						mReply.setStatus(ReplyStatus.ERROR);
@@ -101,6 +112,8 @@ public class HandleConnection implements Runnable {
 				case AUTH: {
 
 					switch (operacao) {
+					
+					
 					default: {
 						mReply = new Mensagem("");
 						mReply.setStatus(ReplyStatus.ERROR);
@@ -110,8 +123,6 @@ public class HandleConnection implements Runnable {
 
 					break;
 				} // end of AUTH
-				
-				
 				case ADMIN: {
 					switch (operacao) {
 						default: {

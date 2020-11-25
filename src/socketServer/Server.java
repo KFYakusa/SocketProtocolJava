@@ -31,6 +31,7 @@ public class Server {
 		this.clientes = new ArrayList<Cliente>();
 		this.candidatos = new ArrayList<Candidato>();
 	}
+	
 	public Boolean addCandidatos(ArrayList<Candidato> listaCandidatos) {
 		int contador =0;
 		for (Iterator<Candidato> iterator = listaCandidatos.iterator(); iterator.hasNext();) {
@@ -40,6 +41,7 @@ public class Server {
 				contador++;
 			}	
 		}
+		
 		if(contador == listaCandidatos.size()) {
 			return false;
 		}
@@ -83,7 +85,6 @@ public class Server {
 			
 			server.criarServerSocket(5555);
 			server.connectionLoop();
-
 
 		} catch (IOException e) {
 			System.out.println("SERVER ERROR: " + e.getMessage());}
