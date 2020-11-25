@@ -16,6 +16,7 @@ public class Server {
 	private List<Candidato> candidatos;
 	private List<Cliente> clientes;
 	private List<Thread> ativos;
+	private Boolean ElectionisOn;
 
 	private void criarServerSocket(int porta) throws IOException {
 		serverSocket = new ServerSocket(porta);
@@ -30,6 +31,14 @@ public class Server {
 	public Server() {
 		this.clientes = new ArrayList<Cliente>();
 		this.candidatos = new ArrayList<Candidato>();
+		this.ElectionisOn = false;
+	}
+	
+	public void setElectioisOn(Boolean a) {
+		this.ElectionisOn = a;
+	}
+	public Boolean getElectionisOn() {
+		return this.ElectionisOn;
 	}
 	
 	public Boolean addCandidatos(ArrayList<Candidato> listaCandidatos) {
@@ -54,6 +63,15 @@ public class Server {
 	public boolean hasCliente(Cliente cliente) {
 		return this.getClientes().contains(cliente);
 	}
+	public boolean hasAdmin() {
+		if(clientes.size()==0)
+			return false;
+		for (Cliente cliente : clientes) {
+			if(cliente.getAdmin())
+				return true;
+		}
+		return false;
+	}
 	public boolean addCliente(Cliente cliente) {
 		if(this.hasCliente(cliente)) {
 			System.out.println("already has a user with this name and password");
@@ -61,10 +79,25 @@ public class Server {
 		}
 		return true;
 	}
-	public List<Candidato> getCandidatos() {
-		return candidatos;
+	
+	public String getCandidatos() {
+		String response =null;
+		
+		for (Candidato candidato : candidatos) {
+			response += candidato.getNome() + ", " + candidato.getNumero() + ", " + candidato.getPartido() + "\n";
+		}
+		return response;
 	}
-	public Boolean getSingleCandidato(String numero) {
+	public String getVotos() {
+		String response = null;
+		
+		for (Candidato candidato : candidatos) {
+			response += candidato.getNome() + "( "+ candidato.getNumero()+ " ) : " + candidato.getVotos()+ " votos\n";
+		}
+		return response;
+	}
+	
+	public Boolean IncrementVoteCandidato(String numero) {
 		for (Iterator iterator = candidatos.iterator(); iterator.hasNext();) {
 			Candidato candidato = (Candidato) iterator.next();
 			if(candidato.getNumero()==numero) {

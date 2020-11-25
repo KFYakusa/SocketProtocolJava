@@ -57,42 +57,59 @@ public class HandleConnection implements Runnable {
 				// filtrar por operacao
 				// tratar a requisição
 				// escrever reply pro cliente
-				
+
 				mInput = (Mensagem) input.readObject();
 				operacao = mInput.getOperacao();
 
 				System.out.println("leu mensagem e operacao");
 
 				switch (estado) {
-				
+
 				case CONECTADO: {
 					switch (operacao) {
-					case "LOGIN":{
+					case "LOGIN": {
 						String nome = (String) mInput.getParam("nome");
 						String senha = (String) mInput.getParam("senha");
 						mReply = new Mensagem("LOGINREPLY");
-						if(nome == null || senha == null) {
+						if (nome == null || senha == null) {
 							mReply.setStatus(ReplyStatus.ERROR);
-							mReply.setParam("response", nome!=null? "Senha is NULL" : "Nome is NULL" );
-						}else {
+							mReply.setParam("response", nome != null ? "Senha is NULL" : "Nome is NULL");
+						} else {
 							usuario = new Cliente();
 							usuario.setNome(nome);
 							usuario.setSenha(senha);
-							
+
 							if (!server.hasCliente(usuario)) {
+								if (!server.hasAdmin()) {
+									usuario.setAdmin(true);
+									mReply = new Mensagem("ADMINLOGINREPLY");
+									mReply.setParam("response", "new Captain!, " + usuario.getNome());
+									estado = Estado.ADMIN;
+								} else {
+									usuario.setAdmin(false);
+									mReply.setParam("response", "novo marujo, " + usuario.getNome());
+									estado = Estado.AUTH;
+								}
 								server.addCliente(usuario);
-								mReply.setParam("response", "novo usuário, " + usuario.getNome());
+
 							} else {
-								mReply.setParam("response", "Bem vindo denovo, " + usuario.getNome());
+								if (usuario.getAdmin()) {
+									mReply.setParam("response", "Welcome again Captain! " + usuario.getNome());
+									estado = Estado.ADMIN;
+								} else {
+									mReply.setParam("response", "Bem vindo denovo, " + usuario.getNome());
+									estado = Estado.AUTH;
+								}
+
 							}
-							estado = Estado.AUTH;
+
 						}
-					}// end of LOGIN
-					case "EXIT":{
+					} // end of LOGIN
+					case "EXIT": {
 						mReply = new Mensagem("EXITREPLY");
 						mReply.setStatus(ReplyStatus.OK);
 						mReply.setParam("response", "Farewell, Traveller!");
-						estado  = Estado.EXIT;
+						estado = Estado.EXIT;
 					}
 					default: {
 						mReply = new Mensagem("LOGINREPLY");
@@ -105,52 +122,145 @@ public class HandleConnection implements Runnable {
 				case AUTH: {
 
 					switch (operacao) {
-					case "LOGOUT":{
+					case "LOGOUT": {
 						mReply = new Mensagem("LOGOUTREPLY");
 						mReply.setStatus(ReplyStatus.OK);
-						mReply.setParam("response", "that's a sad decision, "+this.usuario.getNome()+ "?");
+						mReply.setParam("response", "that's a sad decision, " + this.usuario.getNome() + "?");
 						estado = Estado.CONECTADO;
 					}
-					case "VOTE":{
+					case "VOTE": {
 						String numero = (String) mInput.getParam("numero");
-						
-						
+						mReply = new Mensagem("VOTEREPLY");
+						if(numero==null) {
+							mReply.setStatus(ReplyStatus.PARAMNULL);
+							mReply.setParam("response", "");
+						}
+						if (server.IncrementVoteCandidato(numero)) {
+							mReply.setStatus(ReplyStatus.OK);
+							mReply.setParam("response", "vote contabilized");
+						} else {
+							mReply.setStatus(ReplyStatus.ERROR);
+							mReply.setParam("response",
+									"something went wrong trying to vote, do this candidate exists?");
+						}
+						break;
 					}
-					case "LISTCANDIDATOS":{
-						
+					case "LISTCANDIDATOS": {
+						mReply = new Mensagem("LISTCANDIDATOSREPLY");
+						if (server.getCandidatos() == null) {
+							mReply.setStatus(ReplyStatus.ERROR);
+							mReply.setParam("response", "ERROR: there is no candidates yet");
+							break;
+						}
+						mReply.setStatus(ReplyStatus.OK);
+						mReply.setParam("response", server.getCandidatos());
+						break;
+					}
+					case "CONSULTRESULT": {
+						mReply = new Mensagem("CONSULTRESULTREPLY");
+						String resposta = server.getVotos();
+						if (resposta == null) {
+							mReply.setStatus(ReplyStatus.ERROR);
+							mReply.setParam("response", "ERROR: there is no candidates yet");
+							break;
+						}
+						mReply.setStatus(ReplyStatus.OK);
+						mReply.setParam("response", resposta);
+						break;
 					}
 					default: {
-						mReply = new Mensagem("");
+						mReply = new Mensagem("LISTCANDIDATOSREPLY");
 						mReply.setStatus(ReplyStatus.ERROR);
 						mReply.setParam("response", "OPERACAO INVALIDA");
-					}//end of default
+						break;
+					} // end of default
 					}// end of switch(operacao)
 
 					break;
 				} // end of AUTH
 				case ADMIN: {
 					switch (operacao) {
-						default: {
-							mReply = new Mensagem("LISTREPLY");
+					case "ADDCANDIDATO": {
+
+					}
+					case "STARTVOTE": {
+						mReply = new Mensagem("STARTVOTEREPLY");
+						if(server.getElectionisOn()) {
 							mReply.setStatus(ReplyStatus.ERROR);
-							mReply.setParam("response", "OPERACAO INVALIDA");
-						}//end of default
+							mReply.setParam("response", "Votação já foi iniciada");
+							break;
+						}
+						server.setElectioisOn(true);
+						mReply.setStatus(ReplyStatus.OK);
+						mReply.setParam("response", "Ay, Captain! Starting votating now!");
+						break;
+					}
+
+					case "LOGOUT": {
+						mReply = new Mensagem("LOGOUTREPLY");
+						mReply.setStatus(ReplyStatus.OK);
+						mReply.setParam("response", "that's a sad decision, " + this.usuario.getNome() + "?");
+						estado = Estado.CONECTADO;
+					}
+					case "VOTE": {
+						String numero = (String) mInput.getParam("numero");
+						mReply = new Mensagem("VOTEREPLY");
+
+						if (server.IncrementVoteCandidato(numero)) {
+							mReply.setStatus(ReplyStatus.OK);
+							mReply.setParam("response", "vote contabilized");
+						} else {
+							mReply.setStatus(ReplyStatus.ERROR);
+							mReply.setParam("response",
+									"something went wrong trying to vote, do this candidate exists?");
+						}
+						break;
+					}
+					case "LISTCANDIDATOS": {
+						mReply = new Mensagem("LISTCANDIDATOSREPLY");
+						if (server.getCandidatos() == null) {
+							mReply.setStatus(ReplyStatus.ERROR);
+							mReply.setParam("response", "ERROR: there is no candidates yet");
+							break;
+						}
+						mReply.setStatus(ReplyStatus.OK);
+						mReply.setParam("response", server.getCandidatos());
+						break;
+					}
+					case "CONSULTRESULT": {
+						mReply = new Mensagem("CONSULTRESULTREPLY");
+						String resposta = server.getVotos();
+						if (resposta == null) {
+							mReply.setStatus(ReplyStatus.ERROR);
+							mReply.setParam("response", "ERROR: there is no candidates yet");
+							break;
+						}
+						mReply.setStatus(ReplyStatus.OK);
+						mReply.setParam("response", resposta);
+						break;
+					}
+
+					default: {
+						mReply = new Mensagem("LISTREPLY");
+						mReply.setStatus(ReplyStatus.ERROR);
+						mReply.setParam("response", "OPERACAO INVALIDA");
+						break;
+					} // end of default
 					}// end of switch(operacao)
 					break;
 				} // end of ADMIN
 				case EXIT: {
 					switch (operacao) {
 
-						default: {
-							mReply = new Mensagem("LOGINREPLY");
-							mReply.setStatus(ReplyStatus.ERROR);
-							mReply.setParam("response", "OPERACAO INVALIDA");
-						}//end of default
+					default: {
+						mReply = new Mensagem("LOGINREPLY");
+						mReply.setStatus(ReplyStatus.ERROR);
+						mReply.setParam("response", "OPERACAO INVALIDA");
+					} // end of default
 					}// end of switch(operacao)
 					break;
 				} // end of EXIT
-				
-				
+
 				default: {
 
 					break;
