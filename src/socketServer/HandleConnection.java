@@ -75,7 +75,6 @@ public class HandleConnection implements Runnable {
 							mReply.setStatus(ReplyStatus.ERROR);
 							mReply.setParam("response", nome != null ? "Senha is NULL" : "Nome is NULL");
 						} else {
-							usuario = new Cliente();
 							usuario.setNome(nome);
 							usuario.setSenha(senha);
 
@@ -181,7 +180,7 @@ public class HandleConnection implements Runnable {
 				case ADMIN: {
 					switch (operacao) {
 					case "ADDCANDIDATO": {
-
+						 break;
 					}
 					case "STARTVOTE": {
 						mReply = new Mensagem("STARTVOTEREPLY");
@@ -192,7 +191,18 @@ public class HandleConnection implements Runnable {
 						}
 						server.setElectioisOn(true);
 						mReply.setStatus(ReplyStatus.OK);
-						mReply.setParam("response", "Ay, Captain! Starting votating now!");
+						mReply.setParam("response", "Ay, Captain! Starting votation now!");
+						break;
+					}
+					case "ENDVOTE":{
+						mReply = new Mensagem("ENDVOTEREPLY");
+						if(!server.getElectionisOn()) {
+							mReply.setStatus(ReplyStatus.ERROR);
+							mReply.setParam("response", "Votação já foi encerra");
+							break;
+						}
+						mReply.setStatus(ReplyStatus.OK);
+						mReply.setParam("response", "Ay, Captain! back to the bay");
 						break;
 					}
 
@@ -201,6 +211,7 @@ public class HandleConnection implements Runnable {
 						mReply.setStatus(ReplyStatus.OK);
 						mReply.setParam("response", "that's a sad decision, " + this.usuario.getNome() + "?");
 						estado = Estado.CONECTADO;
+						break;
 					}
 					case "VOTE": {
 						String numero = (String) mInput.getParam("numero");
