@@ -64,6 +64,16 @@ public class Server {
 	public List<Candidato> getCandidatos() {
 		return candidatos;
 	}
+	public Boolean getSingleCandidato(String numero) {
+		for (Iterator iterator = candidatos.iterator(); iterator.hasNext();) {
+			Candidato candidato = (Candidato) iterator.next();
+			if(candidato.getNumero()==numero) {
+				candidato.incrementVotos();
+				return true;
+			}
+		}
+		return false;
+	}
 	public void connectionLoop() throws IOException{
 		int id =0;
 		while(true) {

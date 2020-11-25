@@ -94,11 +94,6 @@ public class HandleConnection implements Runnable {
 						mReply.setParam("response", "Farewell, Traveller!");
 						estado  = Estado.EXIT;
 					}
-					case "LOGOUT":{
-						mReply = new Mensagem("LOGOUTREPLY");
-						mReply.setStatus(ReplyStatus.OK);
-						mReply.setParam("response", "You are not logged in, but thanks to acknowledge us of your presence");
-					}
 					default: {
 						mReply = new Mensagem("LOGINREPLY");
 						mReply.setStatus(ReplyStatus.ERROR);
@@ -107,13 +102,23 @@ public class HandleConnection implements Runnable {
 					}// end of switch(operacao)
 					break;
 				} // end of CONECTADO
-				
-				
 				case AUTH: {
 
 					switch (operacao) {
-					
-					
+					case "LOGOUT":{
+						mReply = new Mensagem("LOGOUTREPLY");
+						mReply.setStatus(ReplyStatus.OK);
+						mReply.setParam("response", "that's a sad decision, "+this.usuario.getNome()+ "?");
+						estado = Estado.CONECTADO;
+					}
+					case "VOTE":{
+						String numero = (String) mInput.getParam("numero");
+						
+						
+					}
+					case "LISTCANDIDATOS":{
+						
+					}
 					default: {
 						mReply = new Mensagem("");
 						mReply.setStatus(ReplyStatus.ERROR);
