@@ -37,7 +37,7 @@ Protocolo de middleware de um sistema de votação. Cliente deve poder votar, co
 #### Tipos Possíveis: 
 
 - String
-
+- Integer
 
 ####  OPERAÇÕES
 

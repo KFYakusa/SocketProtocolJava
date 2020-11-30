@@ -99,11 +99,20 @@ public class HandleConnection implements Runnable {
 									mReply.setParam("response", "Bem vindo denovo, " + usuario.getNome());
 									estado = Estado.AUTH;
 								}
-
 							}
-
 						}
 					} // end of LOGIN
+					case "LISTCANDIDATOS":{
+						mReply = new Mensagem("LISTCANDIDATOSREPLY");
+						if (server.getCandidatos().isEmpty()) {
+							mReply.setStatus(ReplyStatus.ERROR);
+							mReply.setParam("response", "ERROR: there is no candidates yet");
+							break;
+						}
+						mReply.setStatus(ReplyStatus.OK);
+						mReply.setParam("response", server.getCandidatosString());
+						break;
+					}
 					case "EXIT": {
 						mReply = new Mensagem("EXITREPLY");
 						mReply.setStatus(ReplyStatus.OK);
@@ -146,13 +155,15 @@ public class HandleConnection implements Runnable {
 					}
 					case "LISTCANDIDATOS": {
 						mReply = new Mensagem("LISTCANDIDATOSREPLY");
-						if (server.getCandidatos() == null) {
+						if (server.getCandidatos().isEmpty()) {
 							mReply.setStatus(ReplyStatus.ERROR);
 							mReply.setParam("response", "ERROR: there is no candidates yet");
 							break;
 						}
+						
+						
 						mReply.setStatus(ReplyStatus.OK);
-						mReply.setParam("response", server.getCandidatos());
+						mReply.setParam("response", server.getCandidatosString());
 						break;
 					}
 					case "CONSULTRESULT": {
@@ -161,6 +172,11 @@ public class HandleConnection implements Runnable {
 						if (resposta == null) {
 							mReply.setStatus(ReplyStatus.ERROR);
 							mReply.setParam("response", "ERROR: there is no candidates yet");
+							break;
+						}
+						if(server.getElectionisOn()) {
+							mReply.setStatus(ReplyStatus.ERROR);
+							mReply.setParam("response", "ERROR: Votação ainda em curso");
 							break;
 						}
 						mReply.setStatus(ReplyStatus.OK);
@@ -181,7 +197,8 @@ public class HandleConnection implements Runnable {
 					switch (operacao) {
 					case "ADDCANDIDATO": {
 						if(server.getCandidatos().isEmpty()) {
-							Integer number = (Integer) mInput.getParam("quantidade");
+							Integer numberCandidates = (Integer) mInput.getParam("quantidade");
+							
 						}
 						 break;
 					}
@@ -232,13 +249,13 @@ public class HandleConnection implements Runnable {
 					}
 					case "LISTCANDIDATOS": {
 						mReply = new Mensagem("LISTCANDIDATOSREPLY");
-						if (server.getCandidatos() == null) {
+						if (server.getCandidatos().isEmpty()) {
 							mReply.setStatus(ReplyStatus.ERROR);
 							mReply.setParam("response", "ERROR: there is no candidates yet");
 							break;
 						}
 						mReply.setStatus(ReplyStatus.OK);
-						mReply.setParam("response", server.getCandidatos());
+						mReply.setParam("response", server.getCandidatosString());
 						break;
 					}
 					case "CONSULTRESULT": {
@@ -247,6 +264,11 @@ public class HandleConnection implements Runnable {
 						if (resposta == null) {
 							mReply.setStatus(ReplyStatus.ERROR);
 							mReply.setParam("response", "ERROR: there is no candidates yet");
+							break;
+						}
+						if(server.getElectionisOn()) {
+							mReply.setStatus(ReplyStatus.ERROR);
+							mReply.setParam("response", "ERROR: Votação ainda em curso");
 							break;
 						}
 						mReply.setStatus(ReplyStatus.OK);

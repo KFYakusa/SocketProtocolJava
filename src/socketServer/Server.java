@@ -17,7 +17,7 @@ public class Server {
 	private List<Cliente> clientes;
 	private List<Thread> ativos;
 	private Boolean ElectionisOn;
-
+	private Integer quantidadeCandidatos =0;
 	private void criarServerSocket(int porta) throws IOException {
 		serverSocket = new ServerSocket(porta);
 	}
@@ -80,13 +80,16 @@ public class Server {
 		return true;
 	}
 	
-	public String getCandidatos() {
+	public String getCandidatosString() {
 		String response =null;
 		
 		for (Candidato candidato : candidatos) {
 			response += candidato.getNome() + ", " + candidato.getNumero() + ", " + candidato.getPartido() + "\n";
 		}
 		return response;
+	}
+	public List<Candidato> getCandidatos(){
+		return candidatos;
 	}
 	public String getVotos() {
 		String response = null;
