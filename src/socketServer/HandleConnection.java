@@ -4,7 +4,10 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
+import utilConnection.Candidato;
 import utilConnection.Cliente;
 import utilConnection.Estado;
 import utilConnection.Mensagem;
@@ -84,6 +87,7 @@ public class HandleConnection implements Runnable {
 									mReply = new Mensagem("ADMINLOGINREPLY");
 									mReply.setParam("response", "new Captain!, " + usuario.getNome());
 									estado = Estado.ADMIN;
+									System.out.println(estado);
 								} else {
 									usuario.setAdmin(false);
 									mReply.setParam("response", "novo marujo, " + usuario.getNome());
@@ -101,8 +105,9 @@ public class HandleConnection implements Runnable {
 								}
 							}
 						}
+						break;
 					} // end of LOGIN
-					case "LISTCANDIDATOS":{
+					case "LISTCANDIDATOS": {
 						mReply = new Mensagem("LISTCANDIDATOSREPLY");
 						if (server.getCandidatos().isEmpty()) {
 							mReply.setStatus(ReplyStatus.ERROR);
@@ -118,11 +123,13 @@ public class HandleConnection implements Runnable {
 						mReply.setStatus(ReplyStatus.OK);
 						mReply.setParam("response", "Farewell, Traveller!");
 						estado = Estado.EXIT;
+						break;
 					}
 					default: {
 						mReply = new Mensagem("LOGINREPLY");
 						mReply.setStatus(ReplyStatus.ERROR);
 						mReply.setParam("response", "OPERACAO INVALIDA");
+						break;
 					}
 					}// end of switch(operacao)
 					break;
@@ -135,11 +142,12 @@ public class HandleConnection implements Runnable {
 						mReply.setStatus(ReplyStatus.OK);
 						mReply.setParam("response", "that's a sad decision, " + this.usuario.getNome() + "?");
 						estado = Estado.CONECTADO;
+						break;
 					}
 					case "VOTE": {
 						String numero = (String) mInput.getParam("numero");
 						mReply = new Mensagem("VOTEREPLY");
-						if(numero==null) {
+						if (numero == null) {
 							mReply.setStatus(ReplyStatus.PARAMNULL);
 							mReply.setParam("response", "");
 						}
@@ -160,8 +168,7 @@ public class HandleConnection implements Runnable {
 							mReply.setParam("response", "ERROR: there is no candidates yet");
 							break;
 						}
-						
-						
+
 						mReply.setStatus(ReplyStatus.OK);
 						mReply.setParam("response", server.getCandidatosString());
 						break;
@@ -174,7 +181,7 @@ public class HandleConnection implements Runnable {
 							mReply.setParam("response", "ERROR: there is no candidates yet");
 							break;
 						}
-						if(server.getElectionisOn()) {
+						if (server.getElectionisOn()) {
 							mReply.setStatus(ReplyStatus.ERROR);
 							mReply.setParam("response", "ERROR: Votação ainda em curso");
 							break;
@@ -196,16 +203,41 @@ public class HandleConnection implements Runnable {
 				case ADMIN: {
 					switch (operacao) {
 					case "ADDCANDIDATO": {
-						if(server.getCandidatos().isEmpty()) {
-							Integer numberCandidates = (Integer) mInput.getParam("quantidade");
+						mReply = new Mensagem("ADDCANDIDATOREPLY");
+						Integer numberCandidates = 0;
+						if (server.getCandidatos().isEmpty()) {
+							numberCandidates = (Integer) mInput.getParam("quantidade");
+							if (numberCandidates.equals(0)) {
+								mReply.setStatus(ReplyStatus.PARAMNULL);
+								mReply.setParam("response",
+										"Quantidade de candidatos tem que ser informada e maior q 0");
+							}
 						}
-						List<Candidato> candidatos = (List<Candidato>) mInput.getParam("")
+						Candidato cInput;
+						List<Candidato> listCInput = new ArrayList<Candidato>();
+						System.out.println("numero candidatos: "+numberCandidates);
+						while (numberCandidates > 0) {
+							cInput = (Candidato) input.readObject();
+							System.out.println(cInput.getNome());
+							System.out.println(cInput.getNumero());
+							System.out.println(cInput.getPartido());
+							listCInput.add(cInput);
+							numberCandidates = numberCandidates -1;
+						}
 						
-						 break;
+						Boolean deuCerto = server.addCandidatos(listCInput);
+						if (deuCerto) {
+							mReply.setStatus(ReplyStatus.OK);
+							mReply.setParam("response", "OK, só isso?");
+						} else {
+							mReply.setStatus(ReplyStatus.ERROR);
+							mReply.setParam("response", "ERROR: Couldn't add candidates to server's list.");
+						}
+						break;
 					}
 					case "STARTVOTE": {
 						mReply = new Mensagem("STARTVOTEREPLY");
-						if(server.getElectionisOn()) {
+						if (server.getElectionisOn()) {
 							mReply.setStatus(ReplyStatus.ERROR);
 							mReply.setParam("response", "Votação já foi iniciada");
 							break;
@@ -215,9 +247,9 @@ public class HandleConnection implements Runnable {
 						mReply.setParam("response", "Ay, Captain! Starting votation now!");
 						break;
 					}
-					case "ENDVOTE":{
+					case "ENDVOTE": {
 						mReply = new Mensagem("ENDVOTEREPLY");
-						if(!server.getElectionisOn()) {
+						if (!server.getElectionisOn()) {
 							mReply.setStatus(ReplyStatus.ERROR);
 							mReply.setParam("response", "Votação já foi encerra");
 							break;
@@ -230,7 +262,7 @@ public class HandleConnection implements Runnable {
 					case "LOGOUT": {
 						mReply = new Mensagem("LOGOUTREPLY");
 						mReply.setStatus(ReplyStatus.OK);
-						mReply.setParam("response", "that's a sad decision, " + this.usuario.getNome() + "?");
+						mReply.setParam("response", "that's a sad decision, " + this.usuario.getNome() );
 						estado = Estado.CONECTADO;
 						break;
 					}
@@ -246,7 +278,8 @@ public class HandleConnection implements Runnable {
 							mReply.setParam("response",
 									"something went wrong trying to vote, do this candidate exists?");
 						}
-						break;
+						
+						break;	
 					}
 					case "LISTCANDIDATOS": {
 						mReply = new Mensagem("LISTCANDIDATOSREPLY");
@@ -267,7 +300,7 @@ public class HandleConnection implements Runnable {
 							mReply.setParam("response", "ERROR: there is no candidates yet");
 							break;
 						}
-						if(server.getElectionisOn()) {
+						if (server.getElectionisOn()) {
 							mReply.setStatus(ReplyStatus.ERROR);
 							mReply.setParam("response", "ERROR: Votação ainda em curso");
 							break;

@@ -54,10 +54,12 @@ Protocolo de middleware de um sistema de votação. Cliente deve poder votar, co
 | SEM CODIGO        | OK, ERROR         | 
 | -                 | response:String   | 
 
+
 | STARTVOTE         | STARTVOTEREPLY    | 
 | ---               | ---               |
 | SEM CODIGO        | OK, ERROR         | 
 | -                 | response:String   | 
+
 
 | ADDCANDITATO                      | ADDCANDIDATOREPLY     | 
 | ---                               | ---                   |
@@ -72,7 +74,6 @@ Protocolo de middleware de um sistema de votação. Cliente deve poder votar, co
 | -                 | response:String       | 
 
 
-
 | ENDVOTE           | ENDVOTEREPLY      | 
 | ---               | ---               |
 | SEM CODIGO        | OK, ERROR         | 
@@ -83,6 +84,7 @@ Protocolo de middleware de um sistema de votação. Cliente deve poder votar, co
 | ---               | ---                 |
 | SEM CODIGO        | OK, ERROR           | 
 | -                 | response:String     | 
+
 
 | VOTE          | VOTEREPLY             | 
 | ---           | ---                   |
@@ -102,12 +104,15 @@ Protocolo de middleware de um sistema de votação. Cliente deve poder votar, co
 | Estado atual  | Mensagem                      | transição | 
 | ---           | ---                           | ---       | 
 | CONECTADO     | LOGIN,                        | CONECTADO |
+|               | LISTCANDIDATOS                |           |
 |               | EXIT                          |           |
 |               | LOGINREPLY:ERROR              |           |                   
 |               | ADMINLOGINREPLY:ERROR         |           |               
 |               | LOGINREPLY:PARAMNULL          |           |                   
 |               | ADMINLOGINREPLY:PARAMNULL     |           |               
 |               | EXITREPLY:ERROR               |           |           
+|               | LISTCANDIDATOS:OK             |           |
+|               | LISTCANDIDATOS:ERROR          |           |           
 |               | LOGINREPLY:OK                 | AUTH      |                   
 |               | ADMINLOGINREPLY:OK            | ADMIN     |                    
 |               | EXIT:OK                       | EXIT      |               

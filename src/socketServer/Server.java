@@ -15,7 +15,7 @@ public class Server {
 	private ServerSocket serverSocket;
 	private List<Candidato> candidatos;
 	private List<Cliente> clientes;
-	private List<Thread> ativos;
+	private List<Thread> ativos ;
 	private Boolean ElectionisOn;
 	private Integer quantidadeCandidatos =0;
 	private void criarServerSocket(int porta) throws IOException {
@@ -31,6 +31,7 @@ public class Server {
 	public Server() {
 		this.clientes = new ArrayList<Cliente>();
 		this.candidatos = new ArrayList<Candidato>();
+		this.ativos = new ArrayList<Thread>();
 		this.ElectionisOn = false;
 	}
 	
@@ -41,7 +42,7 @@ public class Server {
 		return this.ElectionisOn;
 	}
 	
-	public Boolean addCandidatos(ArrayList<Candidato> listaCandidatos) {
+	public Boolean addCandidatos(List<Candidato> listaCandidatos) {
 		int contador =0;
 		for (Iterator<Candidato> iterator = listaCandidatos.iterator(); iterator.hasNext();) {
 			Candidato candidato = (Candidato) iterator.next();
@@ -51,7 +52,7 @@ public class Server {
 			}	
 		}
 		
-		if(contador == listaCandidatos.size()) {
+		if(contador == 0) {
 			return false;
 		}
 		return true;
@@ -101,12 +102,13 @@ public class Server {
 	}
 	
 	public Boolean IncrementVoteCandidato(String numero) {
-		for (Iterator iterator = candidatos.iterator(); iterator.hasNext();) {
-			Candidato candidato = (Candidato) iterator.next();
-			if(candidato.getNumero()==numero) {
-				candidato.incrementVotos();
+		
+		for(int i = 0; i< this.candidatos.size(); i++) {
+			if(candidatos.get(i).getNumero().equalsIgnoreCase(numero)) {
+				System.out.println("ta entrando no return true"); 
 				return true;
 			}
+				
 		}
 		return false;
 	}

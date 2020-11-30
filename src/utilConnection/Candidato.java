@@ -1,6 +1,8 @@
 package utilConnection;
 
-public class Candidato {
+import java.io.Serializable;
+
+public class Candidato implements Serializable{
 	private String nome;
 	private String numero;
 	private String partido;
