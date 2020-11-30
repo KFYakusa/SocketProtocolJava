@@ -198,8 +198,9 @@ public class HandleConnection implements Runnable {
 					case "ADDCANDIDATO": {
 						if(server.getCandidatos().isEmpty()) {
 							Integer numberCandidates = (Integer) mInput.getParam("quantidade");
-							
 						}
+						List<Candidato> candidatos = (List<Candidato>) mInput.getParam("")
+						
 						 break;
 					}
 					case "STARTVOTE": {

@@ -63,9 +63,7 @@ Protocolo de middleware de um sistema de votação. Cliente deve poder votar, co
 | ---                               | ---                   |
 | SEM CODIGO                        | OK, ERROR, PARAMNULL  | 
 | nome:String                       | response:String       | 
-| numero:String                     | -                     | 
-| partido:String                    | -                     | 
-| quantidade: Integer (opcional)    | -
+| ListaCandidatos:List< Candidato>  | -                     | 
 
 
 | LISTCANDIDATOS    | LISTCANDIDATOSREPLY   | 
