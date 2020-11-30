@@ -1,14 +1,6 @@
 # TCPySocket
-A TCP Socket that supports multiple users using Python 3.
+A TCP Socket that supports multiple users using Java.
 
-### How to run
-```
-git clone https://github.com/diegosoriarios/TCPySocket
-cd TCPySocket
-python3 server.py
-# Em outros terminais
-python3 client.py
-```
 
 ### Protocolo
 
