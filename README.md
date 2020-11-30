@@ -67,13 +67,13 @@ Protocolo de middleware de um sistema de votação. Cliente deve poder votar, co
 | SEM CODIGO        | OK, ERROR         | 
 | -                 | response:String   | 
 
-| ADDCANDITATO      | ADDCANDIDATOREPLY     | 
-| ---               | ---                   |
-| SEM CODIGO        | OK, ERROR, PARAMNULL  | 
-| nome:String       | response:String       | 
-| numero:String     | -                     | 
-| partido:String    | -                     | 
-
+| ADDCANDITATO                      | ADDCANDIDATOREPLY     | 
+| ---                               | ---                   |
+| SEM CODIGO                        | OK, ERROR, PARAMNULL  | 
+| nome:String                       | response:String       | 
+| numero:String                     | -                     | 
+| partido:String                    | -                     | 
+| quantidade: Integer (opcional)    | -
 
 
 | LISTCANDIDATOS    | LISTCANDIDATOSREPLY   | 
@@ -152,7 +152,7 @@ Protocolo de middleware de um sistema de votação. Cliente deve poder votar, co
     LOGIN { nome = daniel, senha = pato}
     → LOGINADMINREPLY:OK
     → ADDCANDIDATO [ 
-    { nome = amaral, numero = 13, partido = ST},
+    { nome = amaral, numero = 13, partido = ST, quantidade = 3},
     { nome = Padre Luiz, numero = 666, partido = IVPB},
     { nome = Antonio da padaria, numero = 26, partido= MB} 
     ] 

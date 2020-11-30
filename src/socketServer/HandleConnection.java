@@ -180,6 +180,9 @@ public class HandleConnection implements Runnable {
 				case ADMIN: {
 					switch (operacao) {
 					case "ADDCANDIDATO": {
+						if(server.getCandidatos().isEmpty()) {
+							Integer number = (Integer) mInput.getParam("quantidade");
+						}
 						 break;
 					}
 					case "STARTVOTE": {
