@@ -7,6 +7,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
+import utilConnection.Candidato;
 import utilConnection.Mensagem;
 import utilConnection.ReplyStatus;
 
@@ -18,26 +19,17 @@ public class Client {
 			ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
 			ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
 			
-			Mensagem m = null;
+			Mensagem m = new Mensagem("THIS WILL NOT LEAVE HERE");
 			Mensagem retornoMensagem = null;
-			String operacao = m.getOperacao();
+			String operacao;
 			BufferedReader reader;
 			String sysInput = null;
 			Boolean logado = false;
 			Boolean admin = false;
 			Boolean accepted = false;
-//			System.out.println(m);
-//			System.out.println("Cliente, antes de enviar a primeira mensagem");
-//			output.writeObject(m);
-//			output.flush(); // enviando pro servidor a mensagem
-//			System.out.println("Cliente, antes de receber o reply");
-//			m = (Mensagem) input.readObject();// recebendo as mensagens REPLY
-////			System.out.println("resposta do servidor: ");// mostrando as REPLY
-//			System.out.println(m.getParam("response"));
-//			operacao = m.getOperacao();// Pegando a operacao da REPLY
+
 			
 			do  {
-				
 				// mostrar menu a cada passagem
 				// receber entrada
 				// escolher qual das opções,
@@ -63,22 +55,21 @@ public class Client {
 				reader = new BufferedReader(new InputStreamReader(System.in));
 				if(!logado) {
 					
-					System.out.print("|--------------------|\n"
-							       + "|	    	           |\n"
-							       + "|       Login        |\n"
+					System.out.println("|--------------------|\n"
+							       + "|		  Login        |\n"
 							       + "|                    |\n"
+							       + "|   LISTCANDIDATOS   |\n"
 							       + "|--------------------|\n"
 							       + " First Name: ");	
 					//creating message for reply
 					m = new Mensagem("LOGIN");
 					// Reading data using readLine
 					while(!accepted) {
-						accepted = true;
+						accepted = false;
 						sysInput = reader.readLine();
 
 						if (sysInput.length() > 0) {
 							m.setParam("nome", sysInput);
-							accepted = false;
 							sysInput = null;
 						}
 						
@@ -88,13 +79,12 @@ public class Client {
 						if (sysInput.length() > 0) {
 							System.out.println(sysInput);
 							m.setParam("senha", sysInput);
-							accepted = false;
+							accepted = true;
 							sysInput = null;
 						}	
-						
 					}
 					
-				}else if(!admin) {
+				}else if(!admin && logado) {
 					
 					System.out.println("|--------------------|\n"
 									 + "|1-LIST CANDIDATOS   |\n"
@@ -114,7 +104,7 @@ public class Client {
 							m = new Mensagem("VOTE");
 							sysInput = null;
 							accepted = true;
-							System.out.print("number of you candidate: ");
+							System.out.println("number of you candidate: ");
 							
 							sysInput = reader.readLine();
 							
@@ -131,7 +121,6 @@ public class Client {
 						}case "4":{
 							accepted = true;
 							m = new Mensagem("CONSULTRESULT");
-							
 							break;
 						}default:{
 							accepted = false;
@@ -143,19 +132,21 @@ public class Client {
 						}// end of Switch(sysInput)
 					}
 					
-				}else { // start of admin menu
-					System.out.print("|--------------------|\n"
+				}else if(admin && logado){ // start of admin menu
+					System.out.println("|--------------------|\n"
 							 	   + "|1-LIST CANDIDATOS   |\n"
 							 	   + "|2-VOTE     3-LOGOUT |\n"
 							 	   + "|4-CONSULT RESULT    |\n"
 							 	   + "|5-START VOTE        |\n"
-							 	   + "|6-STOP VOTE         |\n"
+							 	   + "|6-END VOTE          |\n"
 							 	   + "|7-ADD CANDIDATO     |\n"
 							 	   + "|--------------------|\n"
 							 	   + "Option: ");
 					
 					
-					while(!accepted)
+					while(!accepted) {
+						
+					
 					sysInput = reader.readLine();
 					
 					switch (sysInput) {
@@ -168,7 +159,7 @@ public class Client {
 						m = new Mensagem("VOTE");
 						sysInput = null;
 						accepted = true;
-						System.out.print("number of you candidate: ");
+						System.out.println("number of you candidate: ");
 						
 						sysInput = reader.readLine();
 						
@@ -176,6 +167,7 @@ public class Client {
 							System.out.println("oh, you should write a number!");
 							accepted = false;
 						}
+						m.setParam("numero", sysInput);
 						break;
 					}case "3":{
 						m = new Mensagem("LOGOUT");
@@ -189,16 +181,75 @@ public class Client {
 						break;
 					}case "5":{
 						m = new Mensagem("STARTVOTE");
+						
 						accepted = true;
 						
 						break;
 					}case "6":{
-						m = new Mensagem("STOPVOTE");
+						m = new Mensagem("ENDVOTE");
+						
 						accepted = true;
 						break;
 					}case "7":{
 						m = new Mensagem("ADDCANDIDATO");
+						System.out.println("Quantidade de Candidatos: ");
+						sysInput = reader.readLine();
+						Integer quantidadeCandidatos = Integer.parseInt(sysInput);
+						String nome;
+						String numero;
+						String partido;
+						m.setParam("quantidade", quantidadeCandidatos);
 						
+						output.writeObject(m);
+						output.flush();
+						
+						while(quantidadeCandidatos > 0) {
+							
+							sysInput = null;
+							System.out.println("nome candidato: ");
+							sysInput = reader.readLine();
+							while(sysInput.length()==0) {
+								sysInput = null;
+								System.out.println("nome must be informed");
+								sysInput = reader.readLine();
+							}
+							nome = sysInput;
+							
+							sysInput = null;
+							System.out.println("numero candidato: ");
+							sysInput = reader.readLine();
+							while(sysInput.length()==0) {
+								sysInput = null;
+								System.out.println("numero must be informed: ");
+								sysInput = reader.readLine();
+							}
+							numero = sysInput;
+							
+							sysInput = null;
+							System.out.println("partido: ");
+							sysInput = reader.readLine();
+							while(sysInput.length()==0) {
+								sysInput = null;
+								System.out.println("partido must be informed: ");
+								sysInput = reader.readLine();
+							}
+							partido = sysInput;
+							
+							Candidato c = new Candidato(nome, numero, partido);
+							output.writeObject(c);
+							output.flush();
+							
+							quantidadeCandidatos = quantidadeCandidatos -1;
+						}
+						
+						retornoMensagem = (Mensagem) input.readObject();// recebendo as mensagens REPLY
+//						System.out.println("Se recebido o REPLY, abaixo deve-se receber os parâmetros");
+						System.out.println(retornoMensagem.getParam("response"));
+						
+						if(retornoMensagem.getStatus().equals(ReplyStatus.OK)) {
+							accepted = true;
+						}
+						m = new Mensagem("LISTCANDIDATOS");
 						
 						break;
 					}
@@ -210,26 +261,28 @@ public class Client {
 						break;
 					}// end of default
 				}//end of Switch(sysInput);
+					}
 				}// end of admin menu
 				
 				
 
-				System.out.println("Enviando pro servidor");
+//				System.out.println("Enviando pro servidor");
 				output.writeObject(m);
 				output.flush(); // enviando pro servidor a mensagem
 				// ---------------------------------------------------------------------- HERE FINISH WRITING
 
-				System.out.println("abaixo está sendo recebida a mensagem do servidor");
+//				System.out.println("abaixo está sendo recebida a mensagem do servidor");
 				
 				//------------------------------------------------------- HERE START LISTENING FROM SERVER
 				
 				retornoMensagem = (Mensagem) input.readObject();// recebendo as mensagens REPLY
-				System.out.println("Se recebido o REPLY, abaixo deve-se receber os parâmetros");
-				System.out.println(m.getParam("response"));
+//				System.out.println("Se recebido o REPLY, abaixo deve-se receber os parâmetros");
+				System.out.println(retornoMensagem.getParam("response"));
 				
-				System.out.println("resposta do servidor: " + retornoMensagem);// mostrando as REPLY
+				System.out.println("resposta do servidor:" + retornoMensagem);// mostrando as REPLY
 				operacao = retornoMensagem.getOperacao();// PEgando a operacao da REPLY
 				System.out.println(operacao);
+				
 				
 				if(retornoMensagem.getStatus()==ReplyStatus.ERROR) {
 					System.out.println("some Wrong happened, talk to IT professional for further instructions");
@@ -237,21 +290,22 @@ public class Client {
 				}else if(retornoMensagem.getStatus()==ReplyStatus.PARAMNULL) {
 					System.out.println("ooh, You, somehow, forgot to fill important information, try again :) ");
 					
-				}else if(operacao == "LOGINREPLY") {
+				}else if(operacao.equals("LOGINREPLY")) {
 					logado = true;
 					admin = false;
 					
-				}else if(operacao == "ADMINLOGINREPLY") {
+				}else if(operacao.equals("ADMINLOGINREPLY")) {
+					System.out.println("ta entrando no adminLogingREPLY");
 					logado = true;
 					admin = true;
 					
-				}else if(operacao == "LOGOUTREPLY") {
+				}else if(operacao.equals("LOGOUTREPLY") ) {
 					logado = false;
 					admin = false;
 				}
 				
 				
-			}while (!operacao.equals("LOGOUTREPLY") || retornoMensagem.getStatus() != ReplyStatus.OK);//end of while
+			}while (!operacao.equals("LOGOUTREPLY") || !retornoMensagem.getStatus().equals(ReplyStatus.OK));//end of while
 
 			/*
 			 * if (m.getStatus() == Status.OK) { String resposta = (String)
