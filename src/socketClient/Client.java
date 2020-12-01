@@ -56,11 +56,11 @@ public class Client {
 				if(!logado) {
 					
 					System.out.println("|--------------------|\n"
-							       + "|		  Login        |\n"
-							       + "|                    |\n"
-							       + "|   LISTCANDIDATOS   |\n"
-							       + "|--------------------|\n"
-							       + " First Name: ");	
+							       	 + "|       Login        |\n"
+							         + "|                    |\n"
+							         + "|   LISTCANDIDATOS   |\n"
+							         + "|--------------------|\n"
+							         + " First Name: ");	
 					//creating message for reply
 					m = new Mensagem("LOGIN");
 					// Reading data using readLine
@@ -145,8 +145,6 @@ public class Client {
 					
 					
 					while(!accepted) {
-						
-					
 					sysInput = reader.readLine();
 					
 					switch (sysInput) {
@@ -279,9 +277,9 @@ public class Client {
 //				System.out.println("Se recebido o REPLY, abaixo deve-se receber os parâmetros");
 				System.out.println(retornoMensagem.getParam("response"));
 				
-				System.out.println("resposta do servidor:" + retornoMensagem);// mostrando as REPLY
+//				System.out.println("resposta do servidor:" + retornoMensagem);// mostrando as REPLY
 				operacao = retornoMensagem.getOperacao();// PEgando a operacao da REPLY
-				System.out.println(operacao);
+//				System.out.println(operacao);
 				
 				
 				if(retornoMensagem.getStatus()==ReplyStatus.ERROR) {
@@ -295,7 +293,7 @@ public class Client {
 					admin = false;
 					
 				}else if(operacao.equals("ADMINLOGINREPLY")) {
-					System.out.println("ta entrando no adminLogingREPLY");
+					
 					logado = true;
 					admin = true;
 					
