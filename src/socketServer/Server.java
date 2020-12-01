@@ -85,18 +85,25 @@ public class Server {
 		String response =null;
 		
 		for (Candidato candidato : candidatos) {
-			response += candidato.getNome() + ", " + candidato.getNumero() + ", " + candidato.getPartido() + "\n";
+			if(response==null) {
+				response = candidato.getNome() + ", " + candidato.getNumero() + ", " + candidato.getPartido() + "\n";	
+			}else
+				response += candidato.getNome() + ", " + candidato.getNumero() + ", " + candidato.getPartido() + "\n";
 		}
 		return response;
 	}
 	public List<Candidato> getCandidatos(){
 		return candidatos;
 	}
+	
 	public String getVotos() {
 		String response = null;
 		
 		for (Candidato candidato : candidatos) {
-			response += candidato.getNome() + "( "+ candidato.getNumero()+ " ) : " + candidato.getVotos()+ " votos\n";
+			if(response == null) {
+				response = candidato.getNome() + "( "+ candidato.getNumero()+ " ) : " + candidato.getVotos()+ " votos\n";	
+			}else
+				response += candidato.getNome() + "( "+ candidato.getNumero()+ " ) : " + candidato.getVotos()+ " votos\n";
 		}
 		return response;
 	}

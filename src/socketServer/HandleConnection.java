@@ -147,17 +147,16 @@ public class HandleConnection implements Runnable {
 					case "VOTE": {
 						String numero = (String) mInput.getParam("numero");
 						mReply = new Mensagem("VOTEREPLY");
-						if (numero == null) {
+						if (numero.isBlank()) {
 							mReply.setStatus(ReplyStatus.PARAMNULL);
-							mReply.setParam("response", "");
-						}
-						if (server.IncrementVoteCandidato(numero)) {
+							mReply.setParam("response", "You must digit a number");
+						} else if (server.getElectionisOn() &&server.IncrementVoteCandidato(numero)) {
 							mReply.setStatus(ReplyStatus.OK);
 							mReply.setParam("response", "vote contabilized");
 						} else {
 							mReply.setStatus(ReplyStatus.ERROR);
 							mReply.setParam("response",
-									"something went wrong trying to vote, do this candidate exists?");
+									"ERROR: candidate don't exist or votation hasn't initiated yet");
 						}
 						break;
 					}
@@ -176,18 +175,15 @@ public class HandleConnection implements Runnable {
 					case "CONSULTRESULT": {
 						mReply = new Mensagem("CONSULTRESULTREPLY");
 						String resposta = server.getVotos();
-						if (resposta == null) {
+						if (resposta == null || server.getElectionisOn()) {
 							mReply.setStatus(ReplyStatus.ERROR);
-							mReply.setParam("response", "ERROR: there is no candidates yet");
-							break;
+							mReply.setParam("response", "ERROR: there is no candidates yet or votation hasn't ended");
+							
+						}else {
+							mReply.setStatus(ReplyStatus.OK);
+							mReply.setParam("response", resposta);	
 						}
-						if (server.getElectionisOn()) {
-							mReply.setStatus(ReplyStatus.ERROR);
-							mReply.setParam("response", "ERROR: Votação ainda em curso");
-							break;
-						}
-						mReply.setStatus(ReplyStatus.OK);
-						mReply.setParam("response", resposta);
+						
 						break;
 					}
 					default: {
@@ -269,14 +265,17 @@ public class HandleConnection implements Runnable {
 					case "VOTE": {
 						String numero = (String) mInput.getParam("numero");
 						mReply = new Mensagem("VOTEREPLY");
-
-						if (server.IncrementVoteCandidato(numero)) {
+						
+						if (numero.isBlank()) {
+							mReply.setStatus(ReplyStatus.PARAMNULL);
+							mReply.setParam("response", "You must digit a number");
+						} else if (server.getElectionisOn() && server.IncrementVoteCandidato(numero)) {
 							mReply.setStatus(ReplyStatus.OK);
 							mReply.setParam("response", "vote contabilized");
 						} else {
 							mReply.setStatus(ReplyStatus.ERROR);
 							mReply.setParam("response",
-									"something went wrong trying to vote, do this candidate exists?");
+									"ERROR: candidate don't exist or votation hasn't initiated yet");
 						}
 						
 						break;	
@@ -295,18 +294,15 @@ public class HandleConnection implements Runnable {
 					case "CONSULTRESULT": {
 						mReply = new Mensagem("CONSULTRESULTREPLY");
 						String resposta = server.getVotos();
-						if (resposta == null) {
+						if (resposta == null || server.getElectionisOn()) {
 							mReply.setStatus(ReplyStatus.ERROR);
-							mReply.setParam("response", "ERROR: there is no candidates yet");
-							break;
+							mReply.setParam("response", "ERROR: there is no candidates yet or votation hasn't ended");
+							
+						}else {
+							mReply.setStatus(ReplyStatus.OK);
+							mReply.setParam("response", resposta);	
 						}
-						if (server.getElectionisOn()) {
-							mReply.setStatus(ReplyStatus.ERROR);
-							mReply.setParam("response", "ERROR: Votação ainda em curso");
-							break;
-						}
-						mReply.setStatus(ReplyStatus.OK);
-						mReply.setParam("response", resposta);
+						
 						break;
 					}
 
