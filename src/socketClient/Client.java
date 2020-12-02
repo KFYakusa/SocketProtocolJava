@@ -56,32 +56,50 @@ public class Client {
 				if(!logado) {
 					
 					System.out.println("|--------------------|\n"
-							       	 + "|       Login        |\n"
+							       	 + "|       1-Login      |\n"
 							         + "|                    |\n"
-							         + "|   LISTCANDIDATOS   |\n"
-							         + "|--------------------|\n"
-							         + " First Name: ");	
+							         + "|   2-LISTCANDIDATOS |\n"
+							         + "|--------------------|\n");	
 					//creating message for reply
-					m = new Mensagem("LOGIN");
+					
 					// Reading data using readLine
 					while(!accepted) {
+						
 						accepted = false;
 						sysInput = reader.readLine();
-
-						if (sysInput.length() > 0) {
-							m.setParam("nome", sysInput);
-							sysInput = null;
+						switch(sysInput) {
+						case "1":{
+							m = new Mensagem("LOGIN");
+							if (sysInput.length() > 0) {
+								m.setParam("nome", sysInput);
+								sysInput = null;
+							}
+							
+							System.out.println("Password:");
+							sysInput = reader.readLine();
+							
+							if (sysInput.length() > 0) {
+								System.out.println(sysInput);
+								m.setParam("senha", sysInput);
+								accepted = true;
+								sysInput = null;
+								
+							}
+							break;
+						}//end of case 1
+						case "2":{
+							m = new Mensagem("LISTCANDIDATOS");
+							accepted = true;
+							break;
 						}
 						
-						System.out.println("Password:");
-						sysInput = reader.readLine();
-						
-						if (sysInput.length() > 0) {
-							System.out.println(sysInput);
-							m.setParam("senha", sysInput);
-							accepted = true;
-							sysInput = null;
-						}	
+						default:{
+							accepted = false;
+							System.out.println("THERE IS NO HIDDEN OPTION");
+							
+						}
+						}
+							
 					}
 					
 				}else if(!admin && logado) {
@@ -112,7 +130,7 @@ public class Client {
 								System.out.println("oh, you should write a number!");
 								accepted = false;
 							}
-							
+							m.setParam("numero", sysInput);
 							break;
 						}case "3":{
 							accepted = true;
