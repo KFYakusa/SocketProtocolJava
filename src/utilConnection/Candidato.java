@@ -7,6 +7,7 @@ public class Candidato implements Serializable{
 	private String numero;
 	private String partido;
 	private Integer votos;
+	
 	public Candidato(String nome, String numero, String partido) {
 		this.nome = nome;
 		this.numero = numero;
@@ -20,9 +21,11 @@ public class Candidato implements Serializable{
 	public String getPartido() {
 		return partido;
 	}
+	
 	public String getNome() {
 		return nome;
 	}
+	
 	public Integer getVotos() {
 		return votos;
 	}

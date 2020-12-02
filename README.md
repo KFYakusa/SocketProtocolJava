@@ -21,7 +21,7 @@ Protocolo de middleware de um sistema de votação. Cliente deve poder votar, co
 - STARTVOTEREPLY→ Servidor responde a requisição startvote do admin
 - LISTCANDIDATOS→ Cliente pede ao servidor para ver os candidatos existentes
 - LISTCANDIDATOSREPLY→ Servidor envia a lista de candidatos;
-- ENDVOTE→ Admin requisita o encerramento da votação;
+- ENDVOTE→ Admin requisita o encerramento da votação e a apuração dos votos;
 - ENDVOTEREPLY→ Servidor responde à ENDVOTE;
 - CONSULTRESULT→ Cliente requisita ao servidor a contagem de votos;
 - CONSULTRESULTREPLY→ Servidor responde cliente com contagem de votos;

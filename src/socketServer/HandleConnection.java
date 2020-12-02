@@ -65,7 +65,7 @@ public class HandleConnection implements Runnable {
 				operacao = mInput.getOperacao();
 
 				System.out.println("leu mensagem e operacao");
-
+				System.out.println(server.getClientes().toString());
 				switch (estado) {
 
 				case CONECTADO: {
@@ -85,6 +85,7 @@ public class HandleConnection implements Runnable {
 								if (!server.hasAdmin()) {
 									usuario.setAdmin(true);
 									mReply = new Mensagem("ADMINLOGINREPLY");
+
 									mReply.setParam("response", "new Captain!, " + usuario.getNome());
 									estado = Estado.ADMIN;
 									System.out.println(estado);
@@ -96,7 +97,8 @@ public class HandleConnection implements Runnable {
 								server.addCliente(usuario);
 
 							} else {
-								if (usuario.getAdmin()) {
+								Cliente jaexistente = server.getCliente(usuario);
+								if (jaexistente.getAdmin()) {
 									mReply.setParam("response", "Welcome again Captain! " + usuario.getNome());
 									estado = Estado.ADMIN;
 								} else {
@@ -147,10 +149,12 @@ public class HandleConnection implements Runnable {
 					case "VOTE": {
 						String numero = (String) mInput.getParam("numero");
 						mReply = new Mensagem("VOTEREPLY");
-						if (numero.isBlank()) {
+						
+						if (numero == null) {
 							mReply.setStatus(ReplyStatus.PARAMNULL);
 							mReply.setParam("response", "You must digit a number");
-						} else if (server.getElectionisOn() &&server.IncrementVoteCandidato(numero)) {
+						} else if (server.getElectionisOn()) {
+							server.IncrementVoteCandidato(numero);
 							mReply.setStatus(ReplyStatus.OK);
 							mReply.setParam("response", "vote contabilized");
 						} else {
@@ -175,7 +179,8 @@ public class HandleConnection implements Runnable {
 					case "CONSULTRESULT": {
 						mReply = new Mensagem("CONSULTRESULTREPLY");
 						String resposta = server.getVotos();
-						if (resposta == null || server.getElectionisOn()) {
+						if (server.getElectionisOn()|| resposta == null ) {
+							
 							mReply.setStatus(ReplyStatus.ERROR);
 							mReply.setParam("response", "ERROR: there is no candidates yet or votation hasn't ended");
 							
@@ -183,7 +188,6 @@ public class HandleConnection implements Runnable {
 							mReply.setStatus(ReplyStatus.OK);
 							mReply.setParam("response", resposta);	
 						}
-						
 						break;
 					}
 					default: {
@@ -247,9 +251,16 @@ public class HandleConnection implements Runnable {
 						mReply = new Mensagem("ENDVOTEREPLY");
 						if (!server.getElectionisOn()) {
 							mReply.setStatus(ReplyStatus.ERROR);
-							mReply.setParam("response", "Votação já foi encerra");
+							mReply.setParam("response", "Votação já foi encerrada");
 							break;
+						}else {
+							server.setElectioisOn(false);
 						}
+						
+						
+						// ao encerrar ele já apura os votos para que sejam contabilizados
+						server.apurarEleicao(); 
+						
 						mReply.setStatus(ReplyStatus.OK);
 						mReply.setParam("response", "Ay, Captain! back to the bay");
 						break;
@@ -266,10 +277,11 @@ public class HandleConnection implements Runnable {
 						String numero = (String) mInput.getParam("numero");
 						mReply = new Mensagem("VOTEREPLY");
 						
-						if (numero.isBlank()) {
+						if (numero == null) {
 							mReply.setStatus(ReplyStatus.PARAMNULL);
 							mReply.setParam("response", "You must digit a number");
-						} else if (server.getElectionisOn() && server.IncrementVoteCandidato(numero)) {
+						} else if (server.getElectionisOn()) {
+							server.IncrementVoteCandidato(numero);
 							mReply.setStatus(ReplyStatus.OK);
 							mReply.setParam("response", "vote contabilized");
 						} else {

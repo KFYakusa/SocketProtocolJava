@@ -1,6 +1,8 @@
 package utilConnection;
 
-public class Cliente {
+import java.io.Serializable;
+
+public class Cliente implements Serializable{
 	private String nome;
 	private String senha;
 	private Boolean admin;
@@ -9,6 +11,7 @@ public class Cliente {
 		this.admin = null;
 		this.senha = null;
 		this.nome = null;
+
 	}
 	//GETs
 	public Boolean getAdmin() {

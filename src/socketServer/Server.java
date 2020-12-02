@@ -14,10 +14,11 @@ import utilConnection.Cliente;
 public class Server {
 	private ServerSocket serverSocket;
 	private List<Candidato> candidatos;
+	private List<String> votos;
 	private List<Cliente> clientes;
-	private List<Thread> ativos ;
+	private List<Thread> ativos;
 	private Boolean ElectionisOn;
-	private Integer quantidadeCandidatos =0;
+//	private Integer quantidadeCandidatos =0;
 	private void criarServerSocket(int porta) throws IOException {
 		serverSocket = new ServerSocket(porta);
 	}
@@ -32,12 +33,17 @@ public class Server {
 		this.clientes = new ArrayList<Cliente>();
 		this.candidatos = new ArrayList<Candidato>();
 		this.ativos = new ArrayList<Thread>();
+		this.votos = new ArrayList<String>();
 		this.ElectionisOn = false;
 	}
 	
-	public void setElectioisOn(Boolean a) {
+	public synchronized void setElectioisOn(Boolean a) {
 		this.ElectionisOn = a;
+		if(ElectionisOn == false) {
+			notifyAll();
+		}
 	}
+	
 	public Boolean getElectionisOn() {
 		return this.ElectionisOn;
 	}
@@ -57,15 +63,30 @@ public class Server {
 		}
 		return true;
 	}
-	public List<Cliente> getClientes(){
+	public synchronized List<Cliente> getClientes(){
+		
 		return clientes;
 	}
 	
+	public Cliente getCliente(Cliente cliente) {
+		for (Cliente c : clientes) {
+			if(c.getNome().equalsIgnoreCase(cliente.getNome())) {
+				return c;
+			}
+		}
+		return null;
+	}
+	
 	public boolean hasCliente(Cliente cliente) {
-		return this.getClientes().contains(cliente);
+		for (Cliente c : clientes) {
+			if(c.getNome().equalsIgnoreCase(cliente.getNome())) {
+				return true;
+			}
+		}
+		return false;
 	}
 	public boolean hasAdmin() {
-		if(clientes.size()==0)
+		if(clientes.size() < 1 )
 			return false;
 		for (Cliente cliente : clientes) {
 			if(cliente.getAdmin())
@@ -73,11 +94,13 @@ public class Server {
 		}
 		return false;
 	}
-	public boolean addCliente(Cliente cliente) {
+	public synchronized boolean addCliente(Cliente cliente) {
 		if(this.hasCliente(cliente)) {
 			System.out.println("already has a user with this name and password");
+			
 			return false;
 		}
+		this.clientes.add(cliente);
 		return true;
 	}
 	
@@ -96,9 +119,11 @@ public class Server {
 		return candidatos;
 	}
 	
-	public String getVotos() {
+	public synchronized String getVotos() throws InterruptedException{
 		String response = null;
-		
+		while(ElectionisOn) {
+			wait();
+		}
 		for (Candidato candidato : candidatos) {
 			if(response == null) {
 				response = candidato.getNome() + "( "+ candidato.getNumero()+ " ) : " + candidato.getVotos()+ " votos\n";	
@@ -108,17 +133,25 @@ public class Server {
 		return response;
 	}
 	
-	public Boolean IncrementVoteCandidato(String numero) {
+	public synchronized void IncrementVoteCandidato(String numero) {
+		this.votos.add(numero);
 		
-		for(int i = 0; i< this.candidatos.size(); i++) {
-			if(candidatos.get(i).getNumero().equalsIgnoreCase(numero)) {
-				System.out.println("ta entrando no return true"); 
-				return true;
-			}
-				
-		}
-		return false;
 	}
+	
+	public synchronized void apurarEleicao() throws InterruptedException{
+		while(ElectionisOn) {
+			wait();
+		}
+		for (Candidato c : candidatos) {
+			for (int i = 0; i < votos.size(); i++) {
+				if(c.getNumero().equalsIgnoreCase(votos.get(i))) {
+					c.incrementVotos();
+					
+				}
+			}
+		}
+	}
+	
 	public void connectionLoop() throws IOException{
 		int id =0;
 		while(true) {
