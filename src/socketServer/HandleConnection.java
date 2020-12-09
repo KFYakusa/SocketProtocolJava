@@ -65,7 +65,6 @@ public class HandleConnection implements Runnable {
 				operacao = mInput.getOperacao();
 
 				System.out.println("leu mensagem e operacao");
-				System.out.println(server.getClientes().toString());
 				switch (estado) {
 
 				case CONECTADO: {
