@@ -69,7 +69,9 @@ public class Client {
 						sysInput = reader.readLine();
 						switch(sysInput) {
 						case "1":{
+							sysInput= null;
 							m = new Mensagem("LOGIN");
+							sysInput = reader.readLine();
 							if (sysInput.length() > 0) {
 								m.setParam("nome", sysInput);
 								sysInput = null;
